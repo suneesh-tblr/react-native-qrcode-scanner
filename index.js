@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -16,8 +16,8 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 
-import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { RNCamera as Camera } from 'react-native-camera';
+import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {RNCamera as Camera} from 'react-native-camera';
 
 const CAMERA_FLASH_MODE = Camera.Constants.FlashMode;
 const CAMERA_FLASH_MODES = [
@@ -70,14 +70,12 @@ export default class QRCodeScanner extends Component {
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-        }}
-      >
+        }}>
         <Text
           style={{
             textAlign: 'center',
             fontSize: 16,
-          }}
-        >
+          }}>
           Camera not authorized
         </Text>
       </View>
@@ -88,14 +86,12 @@ export default class QRCodeScanner extends Component {
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-        }}
-      >
+        }}>
         <Text
           style={{
             textAlign: 'center',
             fontSize: 16,
-          }}
-        >
+          }}>
           ...
         </Text>
       </View>
@@ -115,9 +111,8 @@ export default class QRCodeScanner extends Component {
           height: Dimensions.get('window').height,
           width: Dimensions.get('window').width,
           backgroundColor: 'black',
-        }}
-      >
-        <Text style={{ color: 'white' }}>Tap to activate camera</Text>
+        }}>
+        <Text style={{color: 'white'}}>Tap to activate camera</Text>
       </View>
     ),
   };
@@ -139,7 +134,7 @@ export default class QRCodeScanner extends Component {
 
   componentDidMount() {
     if (Platform.OS === 'ios') {
-      request(PERMISSIONS.IOS.CAMERA).then(cameraStatus => {
+      request(PERMISSIONS.IOS.CAMERA).then((cameraStatus) => {
         this.setState({
           isAuthorized: cameraStatus === RESULTS.GRANTED,
           isAuthorizationChecked: true,
@@ -153,13 +148,13 @@ export default class QRCodeScanner extends Component {
         title: this.props.permissionDialogTitle,
         message: this.props.permissionDialogMessage,
         buttonPositive: this.props.buttonPositive,
-      }).then(granted => {
+      }).then((granted) => {
         const isAuthorized = granted === PermissionsAndroid.RESULTS.GRANTED;
 
-        this.setState({ isAuthorized, isAuthorizationChecked: true });
+        this.setState({isAuthorized, isAuthorizationChecked: true});
       });
     } else {
-      this.setState({ isAuthorized: true, isAuthorizationChecked: true });
+      this.setState({isAuthorized: true, isAuthorizationChecked: true});
     }
 
     if (this.props.fadeIn) {
@@ -186,14 +181,14 @@ export default class QRCodeScanner extends Component {
   }
 
   disable() {
-    this.setState({ disableVibrationByUser: true });
+    this.setState({disableVibrationByUser: true});
   }
   enable() {
-    this.setState({ disableVibrationByUser: false });
+    this.setState({disableVibrationByUser: false});
   }
 
   _setScanning(value) {
-    this.setState({ scanning: value });
+    this.setState({scanning: value});
   }
 
   _setCamera(value) {
@@ -216,7 +211,7 @@ export default class QRCodeScanner extends Component {
             ]).start();
           }
         }
-      }
+      },
     );
   }
 
@@ -230,7 +225,7 @@ export default class QRCodeScanner extends Component {
       if (this.props.reactivate) {
         this._scannerTimeout = setTimeout(
           () => this._setScanning(false),
-          this.props.reactivateTimeout
+          this.props.reactivateTimeout,
         );
       }
     }
@@ -283,8 +278,7 @@ export default class QRCodeScanner extends Component {
         type={this.props.cameraType}
         flashMode={this.props.flashMode}
         captureAudio={false}
-        {...this.props.cameraProps}
-      >
+        {...this.props.cameraProps}>
         {this._renderCameraMarker()}
       </Camera>
     );
@@ -306,13 +300,13 @@ export default class QRCodeScanner extends Component {
       );
     }
 
-    const { isAuthorized, isAuthorizationChecked } = this.state;
+    const {isAuthorized, isAuthorizationChecked} = this.state;
     if (isAuthorized) {
       if (this.props.cameraTimeout > 0) {
         this.timer && clearTimeout(this.timer);
         this.timer = setTimeout(
           () => this._setCamera(false),
-          this.props.cameraTimeout
+          this.props.cameraTimeout,
         );
       }
 
@@ -322,12 +316,19 @@ export default class QRCodeScanner extends Component {
             style={{
               opacity: this.state.fadeInOpacity,
               backgroundColor: 'transparent',
-              height:
-                (this.props.cameraStyle && this.props.cameraStyle.height) ||
-                styles.camera.height,
-            }}
-          >
-            {this._renderCameraComponent()}
+              // height:Platform.OS === 'android' ? 0 :
+              //   (this.props.cameraStyle && this.props.cameraStyle.height) ||
+              //   styles.camera.height,
+            }}>
+            {Platform.OS === 'android' ? (
+              <View>
+                <View style={{backgroundColor: '#F7F8FB', height: 100}}></View>
+                {this._renderCameraComponent()}
+                <View style={{backgroundColor: '#F7F8FB', height: 50}}></View>
+              </View>
+            ) : (
+              <View>{this._renderCameraComponent()}</View>
+            )}
           </Animated.View>
         );
       }
@@ -345,14 +346,22 @@ export default class QRCodeScanner extends Component {
 
   render() {
     return (
-      <View style={[styles.mainContainer, this.props.containerStyle]}>
-        <View style={[styles.infoView, this.props.topViewStyle]}>
-          {this._renderTopContent()}
-        </View>
+      <View style={[this.props.containerStyle]}>
+        {this._renderTopContent() ? (
+          <View style={[styles.infoView, this.props.topViewStyle]}>
+            {this._renderTopContent()}
+          </View>
+        ) : (
+          <View />
+        )}
         <View style={this.props.cameraStyle}>{this._renderCamera()}</View>
-        <View style={[styles.infoView, this.props.bottomViewStyle]}>
-          {this._renderBottomContent()}
-        </View>
+        {this._renderBottomContent() ? (
+          <View style={[styles.infoView, this.props.bottomViewStyle]}>
+            {this._renderBottomContent()}
+          </View>
+        ) : (
+          <View />
+        )}
       </View>
     );
   }
