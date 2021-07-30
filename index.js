@@ -322,9 +322,9 @@ export default class QRCodeScanner extends Component {
             }}>
             {Platform.OS === 'android' ? (
               <View>
-                <View style={{backgroundColor: '#F7F8FB', height: 100}}></View>
+//                 <View style={{backgroundColor: '#F7F8FB', height: 100}}></View>
                 {this._renderCameraComponent()}
-                <View style={{backgroundColor: '#F7F8FB', height: 50}}></View>
+//                 <View style={{backgroundColor: '#F7F8FB', height: 50}}></View>
               </View>
             ) : (
               <View>{this._renderCameraComponent()}</View>
